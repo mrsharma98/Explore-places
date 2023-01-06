@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 const placesRoutes = require('./routes/places-routes')
+const usersRoutes = require('./routes/users-routes')
 const HttpError = require('./models/http-error')
 
 app = express()
@@ -9,6 +10,7 @@ app = express()
 app.use(bodyParser.json())
 
 app.use('/api/places', placesRoutes);
+app.use('/api/users', usersRoutes);
 
 // Handling all req if we don't get response from on of our placesRoutes
 app.use((req, res, next) => {
