@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const dotenv = require('dotenv').config()
 
 const placesRoutes = require('./routes/places-routes')
 const usersRoutes = require('./routes/users-routes')
@@ -9,6 +10,15 @@ const HttpError = require('./models/http-error')
 app = express()
 
 app.use(bodyParser.json())
+
+// for cors
+app.use((req, res, next) => {
+  // setting headers for the req
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
+  next()
+})
 
 app.use('/api/places', placesRoutes);
 app.use('/api/users', usersRoutes);
@@ -32,9 +42,11 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unknown error occured!' })
 })
 
+
+
 mongoose.set('strictQuery', false);
 mongoose
-  .connect('mongodb+srv://exploreplace:exploreplace@sandbox.jkb6emv.mongodb.net/places?retryWrites=true&w=majority')
+  .connect(`mongodb+srv://${dotenv.parsed.MONGO_USER}:${dotenv.parsed.MONGO_PASSWORD}@sandbox.jkb6emv.mongodb.net/mern?retryWrites=true&w=majority`)
   .then(() => {
     app.listen(5000)
   })

@@ -202,7 +202,7 @@ const deletePlace = async (req, res, next) => {
     await place.remove({ session: sess })
     place.creator.places.pull(place)
     await place.creator.save({ session: sess })
-    sess.commitTransaction()
+    await sess.commitTransaction()
 
   } catch (err) {
     const error = new HttpError(
