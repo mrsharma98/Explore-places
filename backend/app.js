@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
@@ -10,6 +13,9 @@ const HttpError = require('./models/http-error')
 app = express()
 
 app.use(bodyParser.json())
+
+// for images
+app.use('/uploads/images', express.static(path.join('uploads', 'images')))
 
 // for cors
 app.use((req, res, next) => {
@@ -33,6 +39,14 @@ app.use((req, res, next) => {
 // Special middleware, gets attached the every single request that comes
 // will get execute when any middleware before it yields an error
 app.use((error, req, res, next) => {
+  if (req.file) {
+    // if we get any error while signing up, but files gets upload
+    // so this will delete it.
+    // multer adds the file to the req.
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    })
+  }
   // check if res has already being send
   if (res.headerSend) {
     return next(error)

@@ -9,6 +9,7 @@ import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from "../../s
 import { AuthContext } from "../../shared/context/auth-context"
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import ImageUpload from "../../shared/components/FormElements/ImageUpload"
 
 import './Auth.css'
 
@@ -35,13 +36,18 @@ const Auth = () => {
     if (!isLoginMode) {
       setFormData({
         ...formState.inputs,
-        name: undefined
+        name: undefined,
+        image: undefined
       }, formState.inputs.email.isValid && formState.inputs.password.isValid)
     } else {
       setFormData({
         ...formState.inputs,
         name: {
           value: '',
+          isValid: false
+        },
+        image: {
+          value: null,
           isValid: false
         }
       }, false)
@@ -80,19 +86,18 @@ const Auth = () => {
       // if user wants to signup
 
       url = 'http://localhost:5000/api/users/signup'
-      data = JSON.stringify({
-        name: formState.inputs.name.value,
-        email: formState.inputs.email.value,
-        password: formState.inputs.password.value
-      })
+      const formData = new FormData()
+      formData.append('email', formState.inputs.email.value)
+      formData.append('name', formState.inputs.name.value)
+      formData.append('password', formState.inputs.password.value)
+      formData.append('image', formState.inputs.image.value)
 
       try {
 
         const responseData = await sendRequest(
           url,
           'POST',
-          data,
-          { 'Content-Type': 'application/json' }
+          formData
         )
 
         auth.login(responseData.user.id)
@@ -124,6 +129,14 @@ const Auth = () => {
               validators={[VALIDATOR_REQUIRE()]}
               errorText="Please enter your name"
               onInput={inputHandler}
+            />
+          )}
+          {!isLoginMode && (
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please provide an image."
             />
           )}
           <Input
