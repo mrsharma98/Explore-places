@@ -3,12 +3,18 @@ const { check } = require('express-validator')
 
 const placesControllers = require('../controllers/places-controllers')
 const fileUpload = require('../middleware/file-upload')
+const checkAuth = require('../middleware/check-auth')
 
 const router = express.Router()
 
 router.get('/:pid', placesControllers.getPlaceById)
 
 router.get('/user/:uid', placesControllers.getPlacesByUserId)
+
+
+// if we add middleware here, means we are not allowing req to go to rest of the routes without going through the middleware
+// middleware for checking the valid token.
+router.use(checkAuth)
 
 router.post('/',
   fileUpload.single('image'),
